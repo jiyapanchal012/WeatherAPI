@@ -1,57 +1,676 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SkyCast — Live Weather Viewer</title><style>
-:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#183344;background:#f4fafb}*{box-sizing:border-box}body{margin:0}header{max-width:1120px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:25px 20px}header strong{font-size:24px;color:#126e7c}header span{font-size:13px;color:#63848d}.hero{max-width:1120px;margin:0 auto;padding:25px 20px 48px}.hero h1{font-size:clamp(32px,5vw,52px);margin:0 0 9px;letter-spacing:-2px}.hero h1 em{font-style:normal;color:#0b95a8}.hero p{color:#6b8b95;margin:0}.wrap{max-width:1120px;margin:0 auto 35px;padding:0 20px}.search{background:#fff;border:1px solid #dcebef;border-radius:20px;padding:19px;box-shadow:0 12px 30px #27657b12;display:flex;gap:12px}.search input{min-width:0;flex:1;border:1px solid #ccdde4;padding:13px 15px;border-radius:12px;font:inherit}.search button,.quick button{border:0;border-radius:12px;background:#068aa0;color:white;font:inherit;font-weight:800;padding:13px 22px;cursor:pointer}.search button:disabled{opacity:.5}.quick{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:18px 0 22px}.quick span{color:#688992;font-size:12px;font-weight:750}.quick button{background:#e5f4f5;color:#157783;padding:8px 14px;font-size:12px}.status{padding:14px 18px;border-radius:13px;background:#e9f5f6;color:#237280;margin-bottom:20px;font-size:13px}.status.error{background:#fff0f0;color:#b22b47}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:#fff;border:1px solid #dfebee;border-radius:20px;padding:21px;box-shadow:0 10px 25px #1e5b6a0b}.card.main{grid-column:span 2;background:linear-gradient(135deg,#075777,#099fb3);color:white}.card .eyebrow{text-transform:uppercase;letter-spacing:1.2px;font-size:11px;font-weight:800;color:#7b939c}.card.main .eyebrow{color:#c9f9ff}.card h2{font-size:21px;margin:8px 0 7px}.degree{font-weight:850;font-size:64px;letter-spacing:-3px;margin:8px 0}.detail{font-size:13px;color:#5b808c}.main .detail{color:#ddf6f9}.metric{font-size:34px;font-weight:850;margin:15px 0 7px;color:#147b8c}.card small{color:#8b9ea6}.forecast{margin-top:20px;background:white;border:1px solid #dfebee;border-radius:20px;padding:24px}.forecast h2{margin:0 0 17px;font-size:20px}.days{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.day{border-radius:14px;background:#f0f8f9;padding:14px;text-align:center}.day strong{display:block;font-size:13px;margin-bottom:9px}.day span{display:block;color:#6b8990;font-size:12px}.day b{display:block;font-size:18px;margin:8px 0}.loading .card,.loading .day{opacity:.5;animation:pulse 1s infinite alternate}@keyframes pulse{to{opacity:.8}}.hidden{display:none}footer{text-align:center;color:#88a0a8;font-size:12px;padding:10px 10px 26px}@media(max-width:800px){.cards{grid-template-columns:1fr 1fr}.days{grid-template-columns:repeat(3,1fr)}}@media(max-width:480px){.cards{grid-template-columns:1fr 1fr;gap:10px}.card{padding:14px}.card.main{grid-column:1/-1}.metric{font-size:26px}.days{grid-template-columns:repeat(2,1fr)}.search{flex-direction:column}.search button{width:100%}header span{display:none}}
-/* SkyCast redesign: airy weather editorial with warm sunrise gradients */
-:root{font-family:Inter,system-ui,Segoe UI,sans-serif;color:#24374a;background:#fffaf1}
-body{background:linear-gradient(170deg,#fff8ea,#eef8ff 63%,#f5fbfa);min-height:100vh}
-header{max-width:1170px;padding:28px 26px}
-header strong{color:#e17c4c;letter-spacing:-1.3px;font-size:28px}
-header span{color:#778999}
-.hero{max-width:1170px;padding:42px 26px 50px;position:relative}
-.hero:after{content:"";position:absolute;right:10%;top:10px;width:172px;height:172px;background:radial-gradient(circle,#ffcf72 0 36%,#ffe8b0 37% 55%,transparent 56%);opacity:.7;filter:blur(.2px);pointer-events:none}
-.hero h1{position:relative;z-index:1;font-size:clamp(40px,6vw,67px);line-height:1.05;max-width:640px;letter-spacing:-3px}
-.hero h1 em{color:#f2945c}
-.hero p{font-size:16px;color:#6e8295;line-height:1.7;position:relative;z-index:1}
-.wrap{max-width:1170px;padding:0 26px}
-.search{background:#fff;border:1px solid #fff;box-shadow:0 19px 45px #bd97522b;padding:12px;border-radius:20px;position:relative;z-index:1}
-.search input{border:0;background:#fff;padding:17px 20px;font-size:16px}
-.search input:focus{outline:2px solid #f5b57d}
-.search button{background:#f18b59;border-radius:13px;padding:15px 28px}
-.quick{gap:9px;margin:19px 0 25px}
-.quick span{color:#8a8e95;margin-right:5px}
-.quick button{background:#fff0da;color:#9e5d31;border:1px solid #f8dfbc;border-radius:999px}
-.status{background:#eaf5ff;color:#476d8b;border:1px solid #cfe6f8;border-radius:13px}
-.status.error{background:#fff0ed;color:#ac493f;border-color:#f4d2ca}
-.cards{grid-template-columns:repeat(4,1fr);gap:18px}
-.card{border:1px solid #e8eced;border-radius:24px;box-shadow:0 13px 33px #8da7a51b;background:#fff;padding:25px}
-.card.main{background:linear-gradient(150deg,#f7ae70 0%,#f6cc90 54%,#fae7c1 100%);border:0;color:#613b32;position:relative;overflow:hidden}
-.card.main:after{content:"";width:215px;height:215px;position:absolute;right:-55px;top:-75px;border-radius:50%;background:radial-gradient(circle,#fff5db 0 35%,#ffffff40 36% 54%,transparent 55%)}
-.card.main .eyebrow{color:#825042}
-.card.main h2,.main .detail{color:#643f37;position:relative;z-index:1}
-.card .eyebrow{color:#8a9ba8}
-.degree{font-size:75px;position:relative;z-index:1}
-.metric{color:#dd7e52;font-size:38px}
-.detail{color:#738697}
-.card small{color:#889eae}
-.forecast{border-radius:25px;border:1px solid #e7eef1;box-shadow:0 12px 35px #8da7a515;padding:29px}
-.forecast h2{font-size:23px;letter-spacing:-.6px}
-.days{gap:13px}
-.day{background:linear-gradient(180deg,#fff7e9,#f1f8fc);border:1px solid #f1e9dd;border-radius:18px;padding:22px 13px}
-.day strong{color:#b06943}
-.day b{font-size:20px;color:#344f62}
-footer{color:#899ca7}
-@media(max-width:800px){.cards{grid-template-columns:repeat(2,1fr)}.hero:after{right:2%;opacity:.38}}
-@media(max-width:480px){header{padding:21px}.hero{padding:25px 21px 37px}.hero:after{width:100px;height:100px}.wrap{padding:0 14px}.cards{grid-template-columns:1fr 1fr;gap:10px}.card{padding:15px}.card.main{grid-column:1/-1}.degree{font-size:60px}.metric{font-size:29px}.days{grid-template-columns:repeat(2,1fr)}.search{flex-direction:column}.search button{width:100%}}
-</style></head><body>
-<header><strong>SkyCast.</strong><span>Async/Await + Live Weather API</span></header><section class="hero"><h1>A brighter way to<br><em>read the skies.</em></h1><p>A little sunshine for your daily forecast. Find live weather and your five-day outlook.</p></section><main class="wrap"><form class="search" id="search"><input id="city" aria-label="City name" placeholder="Search for a city, e.g. Surat" value="Surat" required><button id="submit" type="submit">Get Weather</button></form><div class="quick"><span>Quick search</span><button type="button" data-city="Surat">Surat</button><button type="button" data-city="Mumbai">Mumbai</button><button type="button" data-city="London">London</button><button type="button" data-city="New York">New York</button></div><div class="status" id="status" role="status" aria-live="polite">Ready to fetch live weather.</div>
-<section id="weather" class="hidden"><div class="cards"><article class="card main"><div class="eyebrow">Current conditions</div><h2 id="place">—</h2><div class="degree" id="temp">—</div><div class="detail" id="conditions">—</div><div class="detail" id="updated">—</div></article><article class="card"><div class="eyebrow">Feels like</div><div class="metric" id="feels">—</div><div class="detail">Apparent temperature</div></article><article class="card"><div class="eyebrow">Humidity</div><div class="metric" id="humidity">—</div><div class="detail">Relative humidity</div></article><article class="card"><div class="eyebrow">Wind speed</div><div class="metric" id="wind">—</div><div class="detail">Kilometres per hour</div></article><article class="card"><div class="eyebrow">Precipitation</div><div class="metric" id="rain">—</div><div class="detail">Current rainfall / snowfall</div></article></div><section class="forecast"><h2>5-Day Forecast</h2><div class="days" id="days"></div></section></section></main><footer>SkyCast · Data: Open-Meteo · No API key required · Internet connection needed</footer>
-<script>
-'use strict';
-const $=id=>document.getElementById(id);
-let requestController=null;
-function weatherText(code){if(code===0)return'Clear sky';if([1,2,3].includes(code))return'Partly cloudy';if([45,48].includes(code))return'Foggy';if([51,53,55,56,57].includes(code))return'Drizzle';if([61,63,65,66,67,80,81,82].includes(code))return'Rain';if([71,73,75,77,85,86].includes(code))return'Snow';if([95,96,99].includes(code))return'Thunderstorm';return'Weather conditions unavailable'}
-function setStatus(msg,error=false){$('status').className='status'+(error?' error':'');$('status').textContent=msg}
-async function getJson(url,signal){const response=await fetch(url,{signal});if(!response.ok)throw new Error('API returned HTTP '+response.status);return response.json()}
-function render(place,data){const now=data.current,daily=data.daily;if(!now||!daily||!Array.isArray(daily.time))throw new Error('Incomplete weather data received.');$('place').textContent=place.name+(place.country?', '+place.country:'');$('temp').textContent=Math.round(now.temperature_2m)+'°C';$('conditions').textContent=weatherText(now.weather_code);$('updated').textContent='Updated: '+now.time.replace('T',' ')+' (local time)';$('feels').textContent=Math.round(now.apparent_temperature)+'°C';$('humidity').textContent=Math.round(now.relative_humidity_2m)+'%';$('wind').textContent=Math.round(now.wind_speed_10m)+' km/h';$('rain').textContent=now.precipitation+' mm';const root=$('days');root.replaceChildren();daily.time.slice(0,5).forEach((date,i)=>{const el=document.createElement('div');el.className='day';const day=new Intl.DateTimeFormat('en',{weekday:'short',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z'));const label=document.createElement('strong');label.textContent=day;const range=document.createElement('b');range.textContent=Math.round(daily.temperature_2m_max[i])+'° / '+Math.round(daily.temperature_2m_min[i])+'°';const desc=document.createElement('span');desc.textContent=weatherText(daily.weather_code[i]);el.append(label,range,desc);root.append(el)});$('weather').classList.remove('hidden')}
-async function searchWeather(name){if(requestController)requestController.abort();const controller=new AbortController();requestController=controller;$('submit').disabled=true;$('weather').classList.add('loading');setStatus('Loading live weather for '+name+'…');try{const geo=await getJson('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&count=1&language=en&format=json',controller.signal);if(!geo.results?.length)throw new Error('City not found. Try another spelling.');const place=geo.results[0];const params=new URLSearchParams({latitude:place.latitude,longitude:place.longitude,current:'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m',daily:'weather_code,temperature_2m_max,temperature_2m_min',timezone:'auto',forecast_days:'5'});const weather=await getJson('https://api.open-meteo.com/v1/forecast?'+params,controller.signal);if(controller.signal.aborted)return;render(place,weather);setStatus('Live forecast loaded for '+place.name+'. Source: Open-Meteo.')}catch(err){if(err.name==='AbortError')return;setStatus('Unable to load weather: '+err.message+' Please check the internet connection and try again.',true)}finally{if(requestController===controller){$('submit').disabled=false;$('weather').classList.remove('loading');requestController=null}}}
-$('search').addEventListener('submit',event=>{event.preventDefault();const name=$('city').value.trim();if(!name){setStatus('Enter a city name.',true);return}searchWeather(name)});document.querySelectorAll('[data-city]').forEach(button=>button.addEventListener('click',()=>{$('city').value=button.dataset.city;searchWeather(button.dataset.city)}));searchWeather('Surat');
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SkyCast — Live Weather Viewer</title>
+    <style>
+        :root {
+            font-family: Inter, system-ui, Segoe UI, sans-serif;
+            color: #183344;
+            background: #f4fafb
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0
+        }
+
+        header {
+            max-width: 1120px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 20px
+        }
+
+        header strong {
+            font-size: 24px;
+            color: #126e7c
+        }
+
+        header span {
+            font-size: 13px;
+            color: #63848d
+        }
+
+        .hero {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 25px 20px 48px
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            margin: 0 0 9px;
+            letter-spacing: -2px
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: #0b95a8
+        }
+
+        .hero p {
+            color: #6b8b95;
+            margin: 0
+        }
+
+        .wrap {
+            max-width: 1120px;
+            margin: 0 auto 35px;
+            padding: 0 20px
+        }
+
+        .search {
+            background: #fff;
+            border: 1px solid #dcebef;
+            border-radius: 20px;
+            padding: 19px;
+            box-shadow: 0 12px 30px #27657b12;
+            display: flex;
+            gap: 12px
+        }
+
+        .search input {
+            min-width: 0;
+            flex: 1;
+            border: 1px solid #ccdde4;
+            padding: 13px 15px;
+            border-radius: 12px;
+            font: inherit
+        }
+
+        .search button,
+        .quick button {
+            border: 0;
+            border-radius: 12px;
+            background: #068aa0;
+            color: white;
+            font: inherit;
+            font-weight: 800;
+            padding: 13px 22px;
+            cursor: pointer
+        }
+
+        .search button:disabled {
+            opacity: .5
+        }
+
+        .quick {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 18px 0 22px
+        }
+
+        .quick span {
+            color: #688992;
+            font-size: 12px;
+            font-weight: 750
+        }
+
+        .quick button {
+            background: #e5f4f5;
+            color: #157783;
+            padding: 8px 14px;
+            font-size: 12px
+        }
+
+        .status {
+            padding: 14px 18px;
+            border-radius: 13px;
+            background: #e9f5f6;
+            color: #237280;
+            margin-bottom: 20px;
+            font-size: 13px
+        }
+
+        .status.error {
+            background: #fff0f0;
+            color: #b22b47
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #dfebee;
+            border-radius: 20px;
+            padding: 21px;
+            box-shadow: 0 10px 25px #1e5b6a0b
+        }
+
+        .card.main {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #075777, #099fb3);
+            color: white
+        }
+
+        .card .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #7b939c
+        }
+
+        .card.main .eyebrow {
+            color: #c9f9ff
+        }
+
+        .card h2 {
+            font-size: 21px;
+            margin: 8px 0 7px
+        }
+
+        .degree {
+            font-weight: 850;
+            font-size: 64px;
+            letter-spacing: -3px;
+            margin: 8px 0
+        }
+
+        .detail {
+            font-size: 13px;
+            color: #5b808c
+        }
+
+        .main .detail {
+            color: #ddf6f9
+        }
+
+        .metric {
+            font-size: 34px;
+            font-weight: 850;
+            margin: 15px 0 7px;
+            color: #147b8c
+        }
+
+        .card small {
+            color: #8b9ea6
+        }
+
+        .forecast {
+            margin-top: 20px;
+            background: white;
+            border: 1px solid #dfebee;
+            border-radius: 20px;
+            padding: 24px
+        }
+
+        .forecast h2 {
+            margin: 0 0 17px;
+            font-size: 20px
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px
+        }
+
+        .day {
+            border-radius: 14px;
+            background: #f0f8f9;
+            padding: 14px;
+            text-align: center
+        }
+
+        .day strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 9px
+        }
+
+        .day span {
+            display: block;
+            color: #6b8990;
+            font-size: 12px
+        }
+
+        .day b {
+            display: block;
+            font-size: 18px;
+            margin: 8px 0
+        }
+
+        .loading .card,
+        .loading .day {
+            opacity: .5;
+            animation: pulse 1s infinite alternate
+        }
+
+        @keyframes pulse {
+            to {
+                opacity: .8
+            }
+        }
+
+        .hidden {
+            display: none
+        }
+
+        footer {
+            text-align: center;
+            color: #88a0a8;
+            font-size: 12px;
+            padding: 10px 10px 26px
+        }
+
+        @media(max-width:800px) {
+            .cards {
+                grid-template-columns: 1fr 1fr
+            }
+
+            .days {
+                grid-template-columns: repeat(3, 1fr)
+            }
+        }
+
+        @media(max-width:480px) {
+            .cards {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px
+            }
+
+            .card {
+                padding: 14px
+            }
+
+            .card.main {
+                grid-column: 1/-1
+            }
+
+            .metric {
+                font-size: 26px
+            }
+
+            .days {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .search {
+                flex-direction: column
+            }
+
+            .search button {
+                width: 100%
+            }
+
+            header span {
+                display: none
+            }
+        }
+
+        /* SkyCast redesign: airy weather editorial with warm sunrise gradients */
+        :root {
+            font-family: Inter, system-ui, Segoe UI, sans-serif;
+            color: #24374a;
+            background: #fffaf1
+        }
+
+        body {
+            background: linear-gradient(170deg, #fff8ea, #eef8ff 63%, #f5fbfa);
+            min-height: 100vh
+        }
+
+        header {
+            max-width: 1170px;
+            padding: 28px 26px
+        }
+
+        header strong {
+            color: #e17c4c;
+            letter-spacing: -1.3px;
+            font-size: 28px
+        }
+
+        header span {
+            color: #778999
+        }
+
+        .hero {
+            max-width: 1170px;
+            padding: 42px 26px 50px;
+            position: relative
+        }
+
+        .hero:after {
+            content: "";
+            position: absolute;
+            right: 10%;
+            top: 10px;
+            width: 172px;
+            height: 172px;
+            background: radial-gradient(circle, #ffcf72 0 36%, #ffe8b0 37% 55%, transparent 56%);
+            opacity: .7;
+            filter: blur(.2px);
+            pointer-events: none
+        }
+
+        .hero h1 {
+            position: relative;
+            z-index: 1;
+            font-size: clamp(40px, 6vw, 67px);
+            line-height: 1.05;
+            max-width: 640px;
+            letter-spacing: -3px
+        }
+
+        .hero h1 em {
+            color: #f2945c
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: #6e8295;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1
+        }
+
+        .wrap {
+            max-width: 1170px;
+            padding: 0 26px
+        }
+
+        .search {
+            background: #fff;
+            border: 1px solid #fff;
+            box-shadow: 0 19px 45px #bd97522b;
+            padding: 12px;
+            border-radius: 20px;
+            position: relative;
+            z-index: 1
+        }
+
+        .search input {
+            border: 0;
+            background: #fff;
+            padding: 17px 20px;
+            font-size: 16px
+        }
+
+        .search input:focus {
+            outline: 2px solid #f5b57d
+        }
+
+        .search button {
+            background: #f18b59;
+            border-radius: 13px;
+            padding: 15px 28px
+        }
+
+        .quick {
+            gap: 9px;
+            margin: 19px 0 25px
+        }
+
+        .quick span {
+            color: #8a8e95;
+            margin-right: 5px
+        }
+
+        .quick button {
+            background: #fff0da;
+            color: #9e5d31;
+            border: 1px solid #f8dfbc;
+            border-radius: 999px
+        }
+
+        .status {
+            background: #eaf5ff;
+            color: #476d8b;
+            border: 1px solid #cfe6f8;
+            border-radius: 13px
+        }
+
+        .status.error {
+            background: #fff0ed;
+            color: #ac493f;
+            border-color: #f4d2ca
+        }
+
+        .cards {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px
+        }
+
+        .card {
+            border: 1px solid #e8eced;
+            border-radius: 24px;
+            box-shadow: 0 13px 33px #8da7a51b;
+            background: #fff;
+            padding: 25px
+        }
+
+        .card.main {
+            background: linear-gradient(150deg, #f7ae70 0%, #f6cc90 54%, #fae7c1 100%);
+            border: 0;
+            color: #613b32;
+            position: relative;
+            overflow: hidden
+        }
+
+        .card.main:after {
+            content: "";
+            width: 215px;
+            height: 215px;
+            position: absolute;
+            right: -55px;
+            top: -75px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff5db 0 35%, #ffffff40 36% 54%, transparent 55%)
+        }
+
+        .card.main .eyebrow {
+            color: #825042
+        }
+
+        .card.main h2,
+        .main .detail {
+            color: #643f37;
+            position: relative;
+            z-index: 1
+        }
+
+        .card .eyebrow {
+            color: #8a9ba8
+        }
+
+        .degree {
+            font-size: 75px;
+            position: relative;
+            z-index: 1
+        }
+
+        .metric {
+            color: #dd7e52;
+            font-size: 38px
+        }
+
+        .detail {
+            color: #738697
+        }
+
+        .card small {
+            color: #889eae
+        }
+
+        .forecast {
+            border-radius: 25px;
+            border: 1px solid #e7eef1;
+            box-shadow: 0 12px 35px #8da7a515;
+            padding: 29px
+        }
+
+        .forecast h2 {
+            font-size: 23px;
+            letter-spacing: -.6px
+        }
+
+        .days {
+            gap: 13px
+        }
+
+        .day {
+            background: linear-gradient(180deg, #fff7e9, #f1f8fc);
+            border: 1px solid #f1e9dd;
+            border-radius: 18px;
+            padding: 22px 13px
+        }
+
+        .day strong {
+            color: #b06943
+        }
+
+        .day b {
+            font-size: 20px;
+            color: #344f62
+        }
+
+        footer {
+            color: #899ca7
+        }
+
+        @media(max-width:800px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .hero:after {
+                right: 2%;
+                opacity: .38
+            }
+        }
+
+        @media(max-width:480px) {
+            header {
+                padding: 21px
+            }
+
+            .hero {
+                padding: 25px 21px 37px
+            }
+
+            .hero:after {
+                width: 100px;
+                height: 100px
+            }
+
+            .wrap {
+                padding: 0 14px
+            }
+
+            .cards {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px
+            }
+
+            .card {
+                padding: 15px
+            }
+
+            .card.main {
+                grid-column: 1/-1
+            }
+
+            .degree {
+                font-size: 60px
+            }
+
+            .metric {
+                font-size: 29px
+            }
+
+            .days {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .search {
+                flex-direction: column
+            }
+
+            .search button {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header><strong>SkyCast.</strong><span>Async/Await + Live Weather API</span></header>
+    <section class="hero">
+        <h1>A brighter way to<br><em>read the skies.</em></h1>
+        <p>A little sunshine for your daily forecast. Find live weather and your five-day outlook.</p>
+    </section>
+    <main class="wrap">
+        <form class="search" id="search"><input id="city" aria-label="City name"
+                placeholder="Search for a city, e.g. Surat" value="Surat" required><button id="submit" type="submit">Get
+                Weather</button></form>
+        <div class="quick"><span>Quick search</span><button type="button" data-city="Surat">Surat</button><button
+                type="button" data-city="Mumbai">Mumbai</button><button type="button"
+                data-city="London">London</button><button type="button" data-city="New York">New York</button></div>
+        <div class="status" id="status" role="status" aria-live="polite">Ready to fetch live weather.</div>
+        <section id="weather" class="hidden">
+            <div class="cards">
+                <article class="card main">
+                    <div class="eyebrow">Current conditions</div>
+                    <h2 id="place">—</h2>
+                    <div class="degree" id="temp">—</div>
+                    <div class="detail" id="conditions">—</div>
+                    <div class="detail" id="updated">—</div>
+                </article>
+                <article class="card">
+                    <div class="eyebrow">Feels like</div>
+                    <div class="metric" id="feels">—</div>
+                    <div class="detail">Apparent temperature</div>
+                </article>
+                <article class="card">
+                    <div class="eyebrow">Humidity</div>
+                    <div class="metric" id="humidity">—</div>
+                    <div class="detail">Relative humidity</div>
+                </article>
+                <article class="card">
+                    <div class="eyebrow">Wind speed</div>
+                    <div class="metric" id="wind">—</div>
+                    <div class="detail">Kilometres per hour</div>
+                </article>
+                <article class="card">
+                    <div class="eyebrow">Precipitation</div>
+                    <div class="metric" id="rain">—</div>
+                    <div class="detail">Current rainfall / snowfall</div>
+                </article>
+            </div>
+            <section class="forecast">
+                <h2>5-Day Forecast</h2>
+                <div class="days" id="days"></div>
+            </section>
+        </section>
+    </main>
+    <footer>SkyCast · Data: Open-Meteo · No API key required · Internet connection needed</footer>
+    <script>
+        'use strict';
+        const $ = id => document.getElementById(id);
+        let requestController = null;
+        function weatherText(code) { if (code === 0) return 'Clear sky'; if ([1, 2, 3].includes(code)) return 'Partly cloudy'; if ([45, 48].includes(code)) return 'Foggy'; if ([51, 53, 55, 56, 57].includes(code)) return 'Drizzle'; if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Rain'; if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow'; if ([95, 96, 99].includes(code)) return 'Thunderstorm'; return 'Weather conditions unavailable' }
+        function setStatus(msg, error = false) { $('status').className = 'status' + (error ? ' error' : ''); $('status').textContent = msg }
+        async function getJson(url, signal) { const response = await fetch(url, { signal }); if (!response.ok) throw new Error('API returned HTTP ' + response.status); return response.json() }
+        function render(place, data) { const now = data.current, daily = data.daily; if (!now || !daily || !Array.isArray(daily.time)) throw new Error('Incomplete weather data received.'); $('place').textContent = place.name + (place.country ? ', ' + place.country : ''); $('temp').textContent = Math.round(now.temperature_2m) + '°C'; $('conditions').textContent = weatherText(now.weather_code); $('updated').textContent = 'Updated: ' + now.time.replace('T', ' ') + ' (local time)'; $('feels').textContent = Math.round(now.apparent_temperature) + '°C'; $('humidity').textContent = Math.round(now.relative_humidity_2m) + '%'; $('wind').textContent = Math.round(now.wind_speed_10m) + ' km/h'; $('rain').textContent = now.precipitation + ' mm'; const root = $('days'); root.replaceChildren(); daily.time.slice(0, 5).forEach((date, i) => { const el = document.createElement('div'); el.className = 'day'; const day = new Intl.DateTimeFormat('en', { weekday: 'short', timeZone: 'UTC' }).format(new Date(date + 'T12:00:00Z')); const label = document.createElement('strong'); label.textContent = day; const range = document.createElement('b'); range.textContent = Math.round(daily.temperature_2m_max[i]) + '° / ' + Math.round(daily.temperature_2m_min[i]) + '°'; const desc = document.createElement('span'); desc.textContent = weatherText(daily.weather_code[i]); el.append(label, range, desc); root.append(el) }); $('weather').classList.remove('hidden') }
+        async function searchWeather(name) { if (requestController) requestController.abort(); const controller = new AbortController(); requestController = controller; $('submit').disabled = true; $('weather').classList.add('loading'); setStatus('Loading live weather for ' + name + '…'); try { const geo = await getJson('https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(name) + '&count=1&language=en&format=json', controller.signal); if (!geo.results?.length) throw new Error('City not found. Try another spelling.'); const place = geo.results[0]; const params = new URLSearchParams({ latitude: place.latitude, longitude: place.longitude, current: 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m', daily: 'weather_code,temperature_2m_max,temperature_2m_min', timezone: 'auto', forecast_days: '5' }); const weather = await getJson('https://api.open-meteo.com/v1/forecast?' + params, controller.signal); if (controller.signal.aborted) return; render(place, weather); setStatus('Live forecast loaded for ' + place.name + '. Source: Open-Meteo.') } catch (err) { if (err.name === 'AbortError') return; setStatus('Unable to load weather: ' + err.message + ' Please check the internet connection and try again.', true) } finally { if (requestController === controller) { $('submit').disabled = false; $('weather').classList.remove('loading'); requestController = null } } }
+        $('search').addEventListener('submit', event => { event.preventDefault(); const name = $('city').value.trim(); if (!name) { setStatus('Enter a city name.', true); return } searchWeather(name) }); document.querySelectorAll('[data-city]').forEach(button => button.addEventListener('click', () => { $('city').value = button.dataset.city; searchWeather(button.dataset.city) })); searchWeather('Surat');
+    </script>
+</body>
+
+</html>
